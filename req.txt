@@ -1,0 +1,4 @@
+fastapi[standard]>=0.141.1
+SQLAlchemy
+mysql-connector-python
+python-dotenv

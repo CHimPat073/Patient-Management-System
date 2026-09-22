@@ -1,5 +1,6 @@
-from sqlalchemy import Float, Integer, String
+from sqlalchemy import Float, Integer, String, Date
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from datetime import date
 
 class Base(DeclarativeBase):
     pass
@@ -15,4 +16,4 @@ class Patient(Base):
     height: Mapped[float] = mapped_column(Float)  # centimeters
     weight: Mapped[float] = mapped_column(Float)  # kilograms
     diagnosis: Mapped[str] = mapped_column(String(100))
-    last_visit: Mapped[str] = mapped_column(String(20))
+    last_visit: Mapped[date] = mapped_column(Date)

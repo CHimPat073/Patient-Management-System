@@ -56,4 +56,4 @@ class PatientUpdate(BaseModel):
     height:Annotated[Optional[float],Field(default=None,gt=0)]
     weight:Annotated[Optional[float],Field(default=None,gt=0)]
     diagnosis:Annotated[Optional[str],Field(default=None)]
-    last_visit:Annotated[Optional[str],Field(default=None)]
+    last_visit:Annotated[Optional[date],Field(default=None)]

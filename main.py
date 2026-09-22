@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 from schema import Patient,PatientUpdate
 from database import Session,engine
 import models
+from datetime import datetime
 
 
 app=FastAPI()
@@ -62,22 +63,32 @@ def veiw_patient(
     return Patient.model_validate(patient).model_dump()
 
 
-@app.get('/sort')
-def sort_patient(sort_by:str=Query(...,description="Sort on basis of age,last_visit"),order:str=Query('asc',description="sort on asc or desc order"),db=Depends(get_db)):
-    valid_fields=['age','last_visit']
+@app.get('/sort', summary='Sort patients', description='Sort all patients by age or last visit date in ascending or descending order.')
+def sort_patient(
+    sort_by: str = Query(..., description='Field to sort by: age or last_visit'),
+    order: str = Query('asc', description='Sort order: asc for ascending or desc for descending'),
+    db=Depends(get_db)
+):
+    valid_fields = ['age', 'last_visit']
 
     if sort_by not in valid_fields:
-        raise HTTPException(status_code=400,detail=f'Invalid field {valid_fields}')
+        raise HTTPException(status_code=400, detail=f"Invalid field. Valid fields: {valid_fields}")
 
-    if order not in ['asc','desc']:
-        raise HTTPException(status_code=400,detail=f'Invalid field.')
+    if order not in ['asc', 'desc']:
+        raise HTTPException(status_code=400, detail="Order must be 'asc' or 'desc'")
 
-    data=load_data()
+    patients = db.query(models.Patient).all()
 
-    sort_order= True if order=='desc' else False
-    sorted_data=sorted(data.values(),key=lambda x:x.get(sort_by,0),reverse=sort_order)
+    if sort_by == 'age':
+        sorted_patients = sorted(patients, key=lambda p: p.age, reverse=(order == "desc"))
+    else:
+        sorted_patients = sorted(
+            patients,
+            key=lambda p: datetime.strptime(str(p.last_visit), "%Y-%m-%d").date(),
+            reverse=(order == "desc")
+        )
 
-    return sorted_data
+    return [Patient.model_validate(p).model_dump() for p in sorted_patients]
 
 @app.post('/create')
 def create_patient(patient:Patient,db=Depends(get_db)):

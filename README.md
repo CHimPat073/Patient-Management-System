@@ -79,9 +79,9 @@ http://127.0.0.1:8000/docs
 
 The database stores the source values such as height, weight, and diagnosis. It does not store `bmi`, `verdict`, or `treatment`. These values are calculated by the Pydantic model when a patient is returned by the API.
 
-## Current Limitation
+## Sorting Patients
 
-The `/sort` endpoint still reads from `patients.json`. The next database migration task is to change it to SQLAlchemy queries so every patient endpoint uses MySQL.
+The `/sort` endpoint reads patient records from MySQL and sorts them by `age` or `last_visit` in ascending or descending order.
 
 ## GitHub Safety
 

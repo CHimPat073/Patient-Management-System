@@ -1,13 +1,20 @@
 from fastapi import APIRouter, Depends, Path, HTTPException, Query
 from app.db.database import get_db
-import app.models.patient as patient
+from app.models.patient import Patient as PatientModel
+from app.repositories.patient_repository import (
+    delete_patient as delete_patient_record,
+    get_all_patients,
+    get_patient_by_id,
+    save_patient,
+    update_patient as update_patient_record,
+)
 from app.schemas.patient import Patient, PatientUpdate
 
 router = APIRouter(prefix='/patients', tags=['patients'])
 
 @router.get('', response_model=list[Patient])
 def view_patients(db=Depends(get_db)):
-    patients = db.query(patient.Patient).all()
+    patients = get_all_patients(db)
     return [Patient.model_validate(patient).model_dump() for patient in patients]
 
 @router.get('/{patient_id}', response_model=Patient)
@@ -15,7 +22,7 @@ def view_patient(
     patient_id: str = Path(..., description='ID of the patient in the DB', examples='P001'),
     db=Depends(get_db),
 ):
-    patient = db.get(patient.Patient, patient_id)
+    patient = get_patient_by_id(db, patient_id)
 
     if patient is None:
         raise HTTPException(status_code=404, detail='Patient Not found')
@@ -26,12 +33,12 @@ def view_patient(
 def create_patient(patient: Patient, db=Depends(get_db)):
     #load existing data
     # data=load_data()
-    existing_patient=db.get(patient.Patient,patient.id)
+    existing_patient = get_patient_by_id(db, patient.id)
     #check if the pateient already exits
     if existing_patient is not None:
         raise HTTPException(status_code=409, detail='Patient already exists')
     #new patient add
-    new_data=patient.Patient(
+    new_data = PatientModel(
         id=patient.id,
         name=patient.name,
         age=patient.age,
@@ -41,10 +48,8 @@ def create_patient(patient: Patient, db=Depends(get_db)):
         diagnosis=patient.diagnosis,
         last_visit=patient.last_visit,
     )
-    #add to new db
-    db.add(new_data)
-    db.commit()
-    db.refresh(new_data)
+    #add to new db via patient_repository
+    save_patient(db,new_data)
     #save to json
     # save_data(data)
 
@@ -54,7 +59,7 @@ def create_patient(patient: Patient, db=Depends(get_db)):
 @router.put('/{patient_id}')
 #path param as patient id  and req body will be a obj of patient Update pydantic obj 
 def update_patient(patient_id: str, patient_update: PatientUpdate, db=Depends(get_db)):
-    patient= db.get(patient.Patient,patient_id)
+    patient = get_patient_by_id(db, patient_id)
     
     # data=load_data()
 
@@ -81,15 +86,14 @@ def update_patient(patient_id: str, patient_update: PatientUpdate, db=Depends(ge
     # data[patient_id] = exsitingpatient_info
 
     # save_data(data)
-    db.commit()
-    db.refresh(patient)
+    update_patient_record(db, patient)
 
     return {'message': 'patient updated'}
 
 
 @router.delete('/{patient_id}')
 def delete_patient(patient_id: str, db=Depends(get_db)):
-    patient=db.get(patient.Patient,patient_id)
+    patient = get_patient_by_id(db, patient_id)
     #load data
     # data= load_data()
 
@@ -97,8 +101,7 @@ def delete_patient(patient_id: str, db=Depends(get_db)):
         raise HTTPException(status_code=404 , detail='Patient not Found')
 
     # del data[patient_id]
-    db.delete(patient)
-    db.commit()
+    delete_patient_record(db, patient)
 
     # save_data(data)
 

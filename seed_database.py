@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from app.db.database import Session, engine
 from app.models.patient import Base, Patient
 
@@ -21,7 +22,9 @@ def seed_database() -> None:
                     height=patient_data["height"],
                     weight=patient_data["weight"],
                     diagnosis=patient_data["diagnosis"],
-                    last_visit=patient_data["last_visit"],
+                    last_visit=datetime.strptime(
+                        str(patient_data["last_visit"]), "%Y-%m-%d"
+                    ).date(),
                 )
             )
 

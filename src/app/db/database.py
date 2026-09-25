@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
+from collections.abc import Generator
 import os
 
 load_dotenv()
@@ -12,4 +13,12 @@ if not db_url:
 
 engine = create_engine(db_url)
 Session = sessionmaker(autoflush=False, bind=engine)
+
+
+def get_db() -> Generator:
+	db = Session()
+	try:
+		yield db
+	finally:
+		db.close()
 

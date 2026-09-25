@@ -1,7 +1,6 @@
 import json
-
-from database import Session, engine
-from models import Base, Patient
+from app.db.database import Session, engine
+from app.models.patient import Base, Patient
 
 
 def seed_database() -> None:

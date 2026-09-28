@@ -10,8 +10,6 @@ app=FastAPI()
 
 app.include_router(patients_router)
 
-patient.Base.metadata.create_all(bind=engine)
-
 @app.get("/")
 def hello():
     return {'message': "patients Management system API"}

@@ -11,6 +11,7 @@ class Patient(Base):
 
     id: Mapped[str] = mapped_column(String(20), primary_key=True)
     name: Mapped[str] = mapped_column(String(100))
+    phone: Mapped[str | None] = mapped_column(String(20), nullable=True)
     age: Mapped[int] = mapped_column(Integer)
     gender: Mapped[str] = mapped_column(String(20))
     height: Mapped[float] = mapped_column(Float)  # centimeters

@@ -8,6 +8,7 @@ class Patient(BaseModel):
 
     id:Annotated[str,Field(...,description="ID of patient",examples=['P001'])]
     name:Annotated[str,Field(...,description='name Of the Patient')]
+    phone:Annotated[Optional[str],Field(default=None,description="enter your Phone number")]
     age:Annotated[int,Field(...,gt=0,lt=100,description="age of patient")]
     gender:Annotated[Literal['male','female','others'],Field(...,description="gender of patient")]
     height:Annotated[float,Field(...,description="height of pateints")]
@@ -51,6 +52,7 @@ class Patient(BaseModel):
 
 class PatientUpdate(BaseModel):
     name:Annotated[Optional[str],Field(default=None)]
+    phone:Annotated[Optional[str],Field(default=None)]
     age:Annotated[Optional[int],Field(default=None,gt=0)]
     gender:Annotated[Optional[Literal['male','female','others']],Field(default=None)]
     height:Annotated[Optional[float],Field(default=None,gt=0)]

@@ -8,12 +8,15 @@ authors = [
 ]
 requires-python = ">=3.11"
 dependencies = [
+    "alembic",
     "fastapi[standard]>=0.141.1",
+    "mysql-connector-python>=26.7.0",
 ]
-
-[project.scripts]
-fast-api = "fast_api:main"
 
 [build-system]
 requires = ["uv_build>=0.12.0,<0.13.0"]
 build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-root = "src"
+module-name = "app"
